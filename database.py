@@ -9,7 +9,6 @@ def conectar():
     return sqlite3.connect(DATABASE)
 
 
-
 def crear_tablas():
 
     conexion = conectar()
@@ -28,8 +27,9 @@ def crear_tablas():
     conexion.close()
 
 
-
 def guardar_recuerdo(tipo, contenido):
+
+    crear_tablas()
 
     conexion = conectar()
     cursor = conexion.cursor()
@@ -49,8 +49,9 @@ def guardar_recuerdo(tipo, contenido):
     conexion.close()
 
 
+def obtener_recuerdos(limite=5):
 
-def obtener_recuerdos(limite=10):
+    crear_tablas()
 
     conexion = conectar()
     cursor = conexion.cursor()
@@ -70,26 +71,5 @@ def obtener_recuerdos(limite=10):
     return recuerdos
 
 
-
-def obtener_recuerdos_por_tipo(tipo, limite=5):
-
-    conexion = conectar()
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-    SELECT fecha, contenido
-    FROM recuerdos
-    WHERE tipo = ?
-    ORDER BY id DESC
-    LIMIT ?
-    """,
-    (
-        tipo,
-        limite
-    ))
-
-    recuerdos = cursor.fetchall()
-
-    conexion.close()
-
-    return recuerdos
+# Inicialización automática de Boby
+crear_tablas()
