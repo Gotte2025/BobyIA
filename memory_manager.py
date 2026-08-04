@@ -1,4 +1,18 @@
 from database import guardar_recuerdo, obtener_recuerdos
+import re
+
+
+def obtener_nombre_usuario():
+
+    recuerdos = obtener_recuerdos(20)
+
+    for fecha, tipo, contenido in recuerdos:
+
+        if tipo == "usuario_nombre":
+            return contenido.replace("El usuario se llama ", "")
+
+    return None
+
 
 
 def analizar_y_guardar(mensaje):
@@ -7,56 +21,107 @@ def analizar_y_guardar(mensaje):
     mensaje = mensaje.lower()
 
     recuerdo = None
+    tipo = "usuario"
 
 
-    # Memoria del usuario
+    # =========================
+    # DETECTAR NOMBRE
+    # =========================
 
-    if "mate" in mensaje or "mates" in mensaje:
-        recuerdo = "Lucas estaba tomando mates."
-
-
-    elif "trabajo" in mensaje or "trabajar" in mensaje:
-        recuerdo = "Lucas habló sobre el trabajo."
-
-
-    elif "casa" in mensaje or "hogar" in mensaje:
-        recuerdo = "Lucas estaba en casa."
+    patrones = [
+        r"soy ([a-záéíóúñ]+)",
+        r"me llamo ([a-záéíóúñ]+)",
+        r"mi nombre es ([a-záéíóúñ]+)"
+    ]
 
 
-    elif "hambre" in mensaje or "comer" in mensaje:
-        recuerdo = "Lucas tenía hambre y pensó en comida."
+    for patron in patrones:
+
+        resultado = re.search(patron, mensaje)
+
+        if resultado:
+
+            nombre = resultado.group(1).capitalize()
+
+            recuerdo = f"El usuario se llama {nombre}"
+            tipo = "usuario_nombre"
+
+            break
 
 
-    elif "cansado" in mensaje or "cansada" in mensaje:
-        recuerdo = "Lucas comentó que estaba cansado."
+
+    # =========================
+    # MEMORIA USUARIO
+    # =========================
+
+    if recuerdo is None:
 
 
-    # Memoria del universo de Boby
-
-    elif "toty" in mensaje or "empanada" in mensaje:
-        recuerdo = "Lucas mencionó a La Toty y sus empanadas misteriosas."
+        if "mate" in mensaje or "mates" in mensaje:
+            recuerdo = "El usuario estaba tomando mates."
 
 
-    elif "pelota" in mensaje:
-        recuerdo = "Boby recordó su pelota imaginaria."
+        elif "trabajo" in mensaje or "trabajar" in mensaje:
+            recuerdo = "El usuario habló sobre el trabajo."
 
+
+        elif "casa" in mensaje or "hogar" in mensaje:
+            recuerdo = "El usuario estaba en casa."
+
+
+        elif "hambre" in mensaje or "comer" in mensaje:
+            recuerdo = "El usuario tenía hambre y pensó en comida."
+
+
+        elif "cansado" in mensaje or "cansada" in mensaje:
+            recuerdo = "El usuario comentó que estaba cansado."
+
+
+    # =========================
+    # UNIVERSO BOBY
+    # =========================
+
+    if recuerdo is None:
+
+
+        if "toty" in mensaje or "empanada" in mensaje:
+
+            recuerdo = "El usuario mencionó a La Toty y sus empanadas misteriosas."
+            tipo = "toty"
+
+
+
+        elif "pelota" in mensaje:
+
+            recuerdo = "Boby recordó su pelota imaginaria."
+            tipo = "historia"
+
+
+
+    # =========================
+    # GUARDAR
+    # =========================
 
     if recuerdo:
 
-        # Evitar duplicados
-        recuerdos = obtener_recuerdos()
 
-        for fecha, texto in recuerdos:
-            if texto == recuerdo:
+        recuerdos = obtener_recuerdos(50)
+
+
+        for fecha, tipo_guardado, contenido in recuerdos:
+
+            if contenido == recuerdo:
                 return False
 
 
+
         guardar_recuerdo(
-            "usuario",
+            tipo,
             recuerdo
         )
 
         return True
+
 
 
     return False
