@@ -49,7 +49,20 @@ BobyIA
 # Instalación
 
 ## Crear entorno virtual
+## Instalación rápida
 
+Clonar:
+
+git clone https://github.com/Gotte2025/BobyIA.git
+
+Entrar:
+
+cd BobyIA
+
+Ejecutar:
+
+.\setup_boby.ps1
+///////////////////////////////////////////////////////////////////////////////////////
 ```bash
 python -m venv .venv
 
